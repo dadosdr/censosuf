@@ -1,7 +1,7 @@
 ---
 title: "Brasil Censos - UF"
 output: 
-  html_document:
+    flexdashboard::flex_dashboard:
     theme: flatly
     self_contained: FALSE
 runtime: shiny
