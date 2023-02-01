@@ -130,7 +130,7 @@ plotmapakn2 = function(..., base,
     
     library(tmap)
     
-    tm_shape(base) + tm_fill(var, 
+    tm_shape(base) + tm_fill("var", 
                              # breaks = c(0,22642931 , 595701218, Inf),
                              style = Style, #"kmeans", # kmeans, sd, fisher, jenks, hclust, bclust, quantile
                              #breaks = Breaks,

@@ -1,0 +1,13 @@
+name: censosuf
+title: censosuf
+username:
+account: smolski
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8157589
+bundleId: 6799022
+url: https://smolski.shinyapps.io/censosuf/
+when: 1675275790.32344
+lastSyncTime: 1675275790.32345
+asMultiple: FALSE
+asStatic: FALSE
