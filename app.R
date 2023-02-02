@@ -60,8 +60,10 @@ censo.uf91 = tidyr::gather(censo.uf91, "Indicador", "Valor", 4:235)
 censo.uf00 = tidyr::gather(censo.uf00, "Indicador", "Valor", 4:235)
 censo.uf10 = tidyr::gather(censo.uf10, "Indicador", "Valor", 4:235)
 censo.br2 = tidyr::gather(censo.br, "Indicador", "Valor", 3:234)
-
-
+censo.brvar = cbind(censo.uf91, censo.uf10)
+colnames(censo.brvar) = c("ANO91", "UF", "UFN91", "Indicador91", "Valor91","ANO910", "UF10","UFN10", "Indicador10", "Valor10")
+censo.brvar$Var = round(censo.brvar$Valor10 - censo.brvar$Valor91,1)
+  
 load("geo.RData")
 colnames(geo.uf)[1] = "UF"
 
@@ -93,14 +95,19 @@ ui <- dashboardPage( skin = "green",
     # Boxes need to be put in a row (or column)
     tabItems(tabItem(tabName = "estados",
             fluidRow(
-              box(title = "Descrição",
-                  htmlOutput("desc")),
               box(title = "1991",
                   leafletOutput("plot1", height = 300)),
               box(title = "2000",
                   leafletOutput("plot2", height = 300)),
               box(title = "2010",
-                  leafletOutput("plot3", height = 300)))),
+                  leafletOutput("plot3", height = 300)),
+            box(title = "Variação 1991-2010",
+                leafletOutput("plot4", height = 300)),
+            box(title = "Descrição",
+                collapsible = TRUE,
+                collapsed=TRUE,
+                # width=5,
+                htmlOutput("desc")))),
             tabItem(tabName = "bra",
                     fluidRow(
                 box(title = "Gráfico", plotOutput("grafico")),
@@ -185,6 +192,8 @@ server <- function(input, output) {
                    Style = "kmeans",
                    label = "Valor"))})
     
+  
+    
     output$desc = renderText({
       req(input$Indicador)
       HTML(paste('<b>Indicador:</b>',
@@ -204,17 +213,39 @@ server <- function(input, output) {
                  '<b><br> Definição:</b>', filter(censo.siglas, SIGLA ==
                                                     input$Indicador)[4]))})
     
-   dados4 =  reactive({
-     req(input$Indicador)
-     filter(censo.br2, Indicador ==
-             input$Indicador)})
-     
+    dados4 = reactive({
+      req(input$Indicador)
+      geo.uf %>%
+        dplyr::left_join(filter(censo.brvar, Indicador10 == 
+                                  input$Indicador) , by = "UF")
+      
+    })
+    
+    output$plot4 = renderLeaflet({
+      library(tmap)
+      tmap_leaflet(
+        plotmapakn(base = dados4(),
+                   var = "Var",
+                   titulo = unique(input$Indicador),
+                   estados = geo.uf,
+                   Id = "UFN",
+                   cores = "Spectral",
+                   Style = "kmeans",
+                   label = "Var"))})
+    
+    dados5 = reactive({
+      req(input$Indicador)
+filter(censo.br2, Indicador == input$Indicador)
+      
+    })
+    
+
 output$grafico <- renderPlot({
   library(ggplot2)
-  # req(input$Indicador)
-ggplot(dados4(), aes(as.factor(ANO), Valor)) +
+  req(input$Indicador)
+ggplot(dados5(), aes(as.factor(ANO), Valor)) +
     geom_col()+
-    labs(x="ANO")+
+    labs(x="ANO", title = input$Indicador)+
     geom_text(aes(label=Valor, vjust=2),color="white", size=10)
 })
 
