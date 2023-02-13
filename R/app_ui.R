@@ -39,15 +39,16 @@
 #' @import ggplot2
 #' @import tseries
 #' @import dplyr
+#' @importFrom dplyr %>%
 source("funcoescred.R")
 
-censo.uf <- read_excel("Atlas2013.xlsx",  sheet = "UF 91-00-10")
-censo.br <- read_excel("Atlas2013.xlsx",  sheet = "BR 91-00-10")
-censo.siglas <- read_excel("Atlas2013.xlsx",  sheet = "Siglas")
+censo.uf <- readxl::read_excel("Atlas2013.xlsx",  sheet = "UF 91-00-10")
+censo.br <- readxl::read_excel("Atlas2013.xlsx",  sheet = "BR 91-00-10")
+censo.siglas <- readxl::read_excel("Atlas2013.xlsx",  sheet = "Siglas")
 colnames(censo.br)[1]= "BRA"
-censo.uf91 = censo.uf %>% dplyr::filter(ANO == "1991")
-censo.uf00 = censo.uf %>% dplyr::filter(ANO == "2000")
-censo.uf10 = censo.uf %>% dplyr::filter(ANO == "2010")
+censo.uf91 = censo.uf |> dplyr::filter(ANO == "1991")
+censo.uf00 = censo.uf |> dplyr::filter(ANO == "2000")
+censo.uf10 = censo.uf |> dplyr::filter(ANO == "2010")
 censo.uf91 = tidyr::gather(censo.uf91, "Indicador", "Valor", 4:235)
 censo.uf00 = tidyr::gather(censo.uf00, "Indicador", "Valor", 4:235)
 censo.uf10 = tidyr::gather(censo.uf10, "Indicador", "Valor", 4:235)
