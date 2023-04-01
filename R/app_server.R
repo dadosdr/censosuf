@@ -6,115 +6,111 @@
 #' @noRd
 app_server <- function(input, output, session) {
 
-
-  dados1 = reactive({
+observeEvent(input$Indicador,{
+  dados1 <- reactive({
     # fetchData(input$Indicador)
     geo.uf %>%
       dplyr::left_join(filter(censo.uf91, Indicador ==
                                 input$Indicador) , by = "UF")})
-
-    # bindCache(input$Indicador)
-
-  output$plot1 = renderTmap({
-    tmap_mode(mode = "view")
-      plotmapakn(base = dados1(),
-                 var = "Valor",
-                 titulo = unique(input$Indicador),
-                 estados = geo.uf,
-                 Id = "UFN",
-                 cores = "Spectral",
-                 Style = "kmeans",
-                 label = "Valor")})
-
-
-
-
-  dados2 = reactive({
+  dados2 <- reactive({
     # fetchData(input$Indicador)
     geo.uf %>%
       dplyr::left_join(filter(censo.uf00, Indicador ==
                                 input$Indicador) , by = "UF")})
-    # bindCache(input$Indicador)
 
-
-  output$plot2 = renderTmap({
-    tmap_mode(mode = "view")
-      plotmapakn(base = dados2(),
-                 var = "Valor",
-                 titulo = unique(input$Indicador),
-                 estados = geo.uf,
-                 Id = "UFN",
-                 cores = "Spectral",
-                 Style = "kmeans",
-                 label = "Valor")})
-    # bindCache(dados2())
-
-
-
-
-  dados3 = reactive({
+  dados3 <- reactive({
     # fetchData(input$Indicador)
     geo.uf %>%
       dplyr::left_join(filter(censo.uf10, Indicador ==
-                                input$Indicador) , by = "UF")}) %>%
-    bindCache(input$Indicador)
+                                input$Indicador) , by = "UF")})
 
-  output$plot3 = renderTmap({
+  output$plot1 <- renderTmap({
     tmap_mode(mode = "view")
-      plotmapakn(base = dados3(),
-                 var = "Valor",
-                 titulo = unique(input$Indicador),
-                 estados = geo.uf,
-                 Id = "UFN",
-                 cores = "Spectral",
-                 Style = "kmeans",
-                 label = "Valor")})
-    # bindCache(dados3())
+    plotmapakn(base = dados1(),
+               var = "Valor",
+               titulo = unique(input$Indicador),
+               estados = geo.uf,
+               Id = "UFN",
+               cores = "Spectral",
+               Style = "kmeans",
+               label = "Valor")})
 
 
 
 
+  output$plot2 <- renderTmap({
+    tmap_mode(mode = "view")
+    plotmapakn(base = dados2(),
+               var = "Valor",
+               titulo = unique(input$Indicador),
+               estados = geo.uf,
+               Id = "UFN",
+               cores = "Spectral",
+               Style = "kmeans",
+               label = "Valor")})
 
-  output$desc = renderText({
-    req(input$Indicador)
-    HTML(paste('<b>Indicador:</b>',
-               filter(censo.siglas, SIGLA ==
-                        input$Indicador)[2],
-               '<b><br> Nome Curto:</b>', filter(censo.siglas, SIGLA ==
-                                                   input$Indicador)[3],
-               '<b><br> Definição:</b>', filter(censo.siglas, SIGLA ==
-                                                  input$Indicador)[4]))})
-  output$desc2 = renderText({
-    req(input$Indicador)
-    HTML(paste('<b>Indicador:</b>',
-               filter(censo.siglas, SIGLA ==
-                        input$Indicador)[2],
-               '<b><br> Nome Curto:</b>', filter(censo.siglas, SIGLA ==
-                                                   input$Indicador)[3],
-               '<b><br> Definição:</b>', filter(censo.siglas, SIGLA ==
-                                                  input$Indicador)[4]))})
 
-  dados4 = reactive({
+  output$plot3 <- renderTmap({
+    tmap_mode(mode = "view")
+    plotmapakn(base = dados3(),
+               var = "Valor",
+               titulo = unique(input$Indicador),
+               estados = geo.uf,
+               Id = "UFN",
+               cores = "Spectral",
+               Style = "kmeans",
+               label = "Valor")})
+
+  dados4 <- reactive({
     # fetchData(input$Indicador)
     geo.uf %>%
       dplyr::left_join(filter(censo.brvar, Indicador10 ==
                                 input$Indicador) , by = "UF")
 
   })
-    # bindCache(input$Indicador)
 
-  output$plot4 = renderTmap({
+  output$plot4 <- renderTmap({
     tmap_mode(mode = "view")
-      plotmapakn(base = dados4(),
-                 var = "Var",
-                 titulo = unique(input$Indicador),
-                 estados = geo.uf,
-                 Id = "UFN",
-                 cores = "Spectral",
-                 Style = "kmeans",
-                 label = "Var")})
+    plotmapakn(base = dados4(),
+               var = "Var",
+               titulo = unique(input$Indicador),
+               estados = geo.uf,
+               Id = "UFN",
+               cores = "Spectral",
+               Style = "kmeans",
+               label = "Var")})
 
-  dados5 = reactive({
+})
+
+
+
+
+
+
+
+
+  output$desc <- renderText({
+    req(input$Indicador)
+    HTML(paste('<b>Indicador:</b>',
+               filter(censo.siglas, SIGLA ==
+                        input$Indicador)[2],
+               '<b><br> Nome Curto:</b>', filter(censo.siglas, SIGLA ==
+                                                   input$Indicador)[3],
+               '<b><br> Definição:</b>', filter(censo.siglas, SIGLA ==
+                                                  input$Indicador)[4]))})
+  output$desc2 <- renderText({
+    req(input$Indicador)
+    HTML(paste('<b>Indicador:</b>',
+               filter(censo.siglas, SIGLA ==
+                        input$Indicador)[2],
+               '<b><br> Nome Curto:</b>', filter(censo.siglas, SIGLA ==
+                                                   input$Indicador)[3],
+               '<b><br> Definição:</b>', filter(censo.siglas, SIGLA ==
+                                                  input$Indicador)[4]))})
+
+
+
+  dados5 <- reactive({
     # fetchData(input$Indicador)
     filter(censo.br2, Indicador == input$Indicador)
   })

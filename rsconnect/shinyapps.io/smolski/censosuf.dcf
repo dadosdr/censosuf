@@ -4,10 +4,10 @@ username:
 account: smolski
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
-appId: 8283346
-bundleId: 7036401
+appId: 8741661
+bundleId: 7037389
 url: https://smolski.shinyapps.io/censosuf/
-when: 1680359353.3233
-lastSyncTime: 1680359353.32331
+when: 1680392055.72962
+lastSyncTime: 1680392055.72964
 asMultiple: FALSE
 asStatic: FALSE

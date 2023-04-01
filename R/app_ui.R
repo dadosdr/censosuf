@@ -16,7 +16,7 @@
 #' @import leaflet
 #' @import sf
 # @import spdep
-#' @import broom
+# @import broom
 # @import spdep
 # @import spatialreg
 # @import rgdal
@@ -25,9 +25,10 @@
 # @import splm
 #' @import ggplot2
 #' @import tmap
-#' @import rgeoda
+# @import rgeoda
 # @import tseries
 #' @importFrom dplyr %>%
+#' @importFrom shinydashboard valueBox
 #source("funcoescred.R")
 library(shinydashboard)
 
@@ -126,6 +127,11 @@ app_ui <- function(request) {
                    # Boxes need to be put in a row (or column)
                    tabItems(tabItem(tabName = "estados",
                                     fluidRow(
+                                      box(title = "Descrição",
+                                          collapsible = TRUE,
+                                          collapsed=FALSE,
+                                          width=12,
+                                          htmlOutput("desc")),
                                       box(title = "1991",
                                           tmapOutput("plot1", height = 300)),
                                       box(title = "2000",
@@ -134,11 +140,7 @@ app_ui <- function(request) {
                                           tmapOutput("plot3", height = 300)),
                                       box(title = "Variação 1991-2010",
                                           tmapOutput("plot4", height = 300)),
-                                      box(title = "Descrição",
-                                          collapsible = TRUE,
-                                          collapsed=TRUE,
-                                          # width=5,
-                                          htmlOutput("desc")))),
+                                      )),
                             tabItem(tabName = "bra",
                                     fluidRow(
                                       box(title = "Gráfico", plotOutput("grafico")),
