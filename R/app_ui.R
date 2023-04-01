@@ -28,12 +28,60 @@
 #' @import rgeoda
 # @import tseries
 #' @importFrom dplyr %>%
-source("funcoescred.R")
+#source("funcoescred.R")
 library(shinydashboard)
 
 
 #devtools::load_all(".")
 #devtools::build()
+
+plotmapakn = function(..., base,
+                      var,
+                      Id,
+                      titulo,
+                      label,
+                      estados,
+                      cores, Style = c("kmeans","sd","jenks","hclust","bclust"))  {
+  {
+
+    # tab = table(ifelse(base$var2<=1,"0 a 1",
+    #                    ifelse(base$var2<=2,"1 a 2", "2 ou maior")))
+
+    library(tmap)
+
+    tm_shape(base) + tm_fill(var,
+                             # breaks = c(0,22642931 , 595701218, Inf),
+                             style = Style, #"kmeans", # kmeans, sd, fisher, jenks, hclust, bclust, quantile
+                             #breaks = Breaks,
+                             # breaks=c(0,quantile(paste(base,"$",var,"[",base,"$",var, ">0]"), na.rm=TRUE)), textNA = "Zero",
+                             colorNA = "gray",
+                             legend.hist = F,
+                             id = Id,
+                             palette=cores)+
+      tm_text(label) +
+      tm_compass(position=c("right", "bottom"))+
+      tm_layout(frame = FALSE, main.title = titulo, asp=0, title.position = c('right', 'top'))+
+      tm_borders("black", lwd=.1, alpha = .3)+
+      tm_scale_bar(width = 0.22, position=c("right", "bottom"),lwd = .2)+
+      tm_legend(position=c("left", "bottom"),
+                # compass.type="arrow",
+                compass.type="8star",
+                # legend.outside = F,
+                legend.format = list(text.separator= "a",
+                                     text.or.more="ou maior",
+                                     text.less.than="menor que"
+                                     ,fun=function(x) formatC(x,
+                                                              big.mark = ".",
+                                                              decimal.mark = ",",
+                                                              digits=2,
+                                                              format="fg"
+                                     )
+                ))+
+
+      tm_shape(estados)+
+      tm_borders("black", lwd=1)
+
+  }}
 
 censo.uf <- readxl::read_excel("Atlas2013.xlsx",  sheet = "UF 91-00-10")
 censo.br <- readxl::read_excel("Atlas2013.xlsx",  sheet = "BR 91-00-10")
