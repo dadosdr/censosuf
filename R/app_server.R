@@ -5,15 +5,18 @@
 #' @import shiny
 #' @noRd
 app_server <- function(input, output, session) {
+
+
   dados1 = reactive({
-    req(input$Indicador)
+    # fetchData(input$Indicador)
     geo.uf %>%
       dplyr::left_join(filter(censo.uf91, Indicador ==
                                 input$Indicador) , by = "UF")})
 
-  output$plot1 = renderLeaflet({
-    library(tmap)
-    tmap_leaflet(
+    # bindCache(input$Indicador)
+
+  output$plot1 = renderTmap({
+    tmap_mode(mode = "view")
       plotmapakn(base = dados1(),
                  var = "Valor",
                  titulo = unique(input$Indicador),
@@ -21,17 +24,21 @@ app_server <- function(input, output, session) {
                  Id = "UFN",
                  cores = "Spectral",
                  Style = "kmeans",
-                 label = "Valor"))})
+                 label = "Valor")})
+
+
+
 
   dados2 = reactive({
-    req(input$Indicador)
+    # fetchData(input$Indicador)
     geo.uf %>%
       dplyr::left_join(filter(censo.uf00, Indicador ==
                                 input$Indicador) , by = "UF")})
+    # bindCache(input$Indicador)
 
-  output$plot2 = renderLeaflet({
-    library(tmap)
-    tmap_leaflet(
+
+  output$plot2 = renderTmap({
+    tmap_mode(mode = "view")
       plotmapakn(base = dados2(),
                  var = "Valor",
                  titulo = unique(input$Indicador),
@@ -39,17 +46,21 @@ app_server <- function(input, output, session) {
                  Id = "UFN",
                  cores = "Spectral",
                  Style = "kmeans",
-                 label = "Valor"))})
+                 label = "Valor")})
+    # bindCache(dados2())
+
+
+
 
   dados3 = reactive({
-    req(input$Indicador)
+    # fetchData(input$Indicador)
     geo.uf %>%
       dplyr::left_join(filter(censo.uf10, Indicador ==
-                                input$Indicador) , by = "UF")})
+                                input$Indicador) , by = "UF")}) %>%
+    bindCache(input$Indicador)
 
-  output$plot3 = renderLeaflet({
-    library(tmap)
-    tmap_leaflet(
+  output$plot3 = renderTmap({
+    tmap_mode(mode = "view")
       plotmapakn(base = dados3(),
                  var = "Valor",
                  titulo = unique(input$Indicador),
@@ -57,7 +68,10 @@ app_server <- function(input, output, session) {
                  Id = "UFN",
                  cores = "Spectral",
                  Style = "kmeans",
-                 label = "Valor"))})
+                 label = "Valor")})
+    # bindCache(dados3())
+
+
 
 
 
@@ -81,16 +95,16 @@ app_server <- function(input, output, session) {
                                                   input$Indicador)[4]))})
 
   dados4 = reactive({
-    req(input$Indicador)
+    # fetchData(input$Indicador)
     geo.uf %>%
       dplyr::left_join(filter(censo.brvar, Indicador10 ==
                                 input$Indicador) , by = "UF")
 
   })
+    # bindCache(input$Indicador)
 
-  output$plot4 = renderLeaflet({
-    library(tmap)
-    tmap_leaflet(
+  output$plot4 = renderTmap({
+    tmap_mode(mode = "view")
       plotmapakn(base = dados4(),
                  var = "Var",
                  titulo = unique(input$Indicador),
@@ -98,23 +112,24 @@ app_server <- function(input, output, session) {
                  Id = "UFN",
                  cores = "Spectral",
                  Style = "kmeans",
-                 label = "Var"))})
+                 label = "Var")})
 
   dados5 = reactive({
-    req(input$Indicador)
+    # fetchData(input$Indicador)
     filter(censo.br2, Indicador == input$Indicador)
-
   })
+    # bindCache(input$Indicador)
 
 
   output$grafico <- renderPlot({
     library(ggplot2)
-    req(input$Indicador)
+    # fetchData(input$Indicador)
     ggplot(dados5(), aes(as.factor(ANO), Valor)) +
       geom_col()+
       labs(x="ANO", title = input$Indicador)+
       geom_text(aes(label=Valor, vjust=2),color="white", size=10)
   })
+    # bindCache(dados5())
 
 
 }

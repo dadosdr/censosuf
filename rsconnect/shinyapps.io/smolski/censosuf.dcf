@@ -5,9 +5,9 @@ account: smolski
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 8283346
-bundleId: 6847358
+bundleId: 7036401
 url: https://smolski.shinyapps.io/censosuf/
-when: 1676420855.08644
-lastSyncTime: 1676420855.08645
+when: 1680359353.3233
+lastSyncTime: 1680359353.32331
 asMultiple: FALSE
 asStatic: FALSE

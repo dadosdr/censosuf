@@ -1,0 +1,356 @@
+---
+title: "Brasil Censos - UF"
+output: 
+    flexdashboard::flex_dashboard:
+    theme: flatly
+    self_contained: FALSE
+runtime: shiny
+logo: logo2.png
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dpi=600)
+```
+
+```{r, echo=FALSE, include=FALSE}
+# setwd("D:/Github/censos/")
+# htmltools::includeHTML("google-analytics.html")
+source("funcoescred.R")
+library(flexdashboard)
+library(plotly)
+library(htmltools)
+library(readxl)
+library(geobr)
+library(tmap)
+library(geobr)
+library(RColorBrewer)
+library(shiny)
+library(leaflet)
+library(sf)
+library(spdep)
+library(broom)
+library(spdep)
+library(spatialreg)
+library(rgdal)
+library(sphet)
+library(tseries)
+library(readxl)
+library(splm)
+library(geobr)
+library(ggplot2)
+library(tmap)
+library(rgeoda)
+library(ggplot2)
+library(tseries)
+library(dplyr)
+
+ 
+
+
+# censo.mun <- read_excel("Atlas2013.xlsx",  sheet = "MUN 91-00-10")
+censo.uf <- read_excel("Atlas2013.xlsx",  sheet = "UF 91-00-10")
+censo.br <- read_excel("Atlas2013.xlsx",  sheet = "BR 91-00-10")
+censo.siglas <- read_excel("Atlas2013.xlsx",  sheet = "Siglas")
+
+# censo.mun = tidyr::gather(censo.mun, "Indicador", "Valor", 6:237)
+censo.uf = tidyr::gather(censo.uf, "Indicador", "Valor", 4:235)
+censo.br = tidyr::gather(censo.br, "Indicador", "Valor", 3:234)
+```
+
+
+
+
+
+```{r, echo=FALSE, include=FALSE}
+
+# uf.rs <- read_state(code_state="RS", year=2018)
+# geo.uf <- read_state()
+
+# geo.br = read_country(year=2010)
+# gc(reset=TRUE)
+# 
+# data("World")
+
+# tm_shape(World, filter = World$continent=="Europe") +
+#     tm_polygons("HPI", id = "name")
+
+  # tm_borders() +
+  #       tm_shape(World,bbox = "Brazil::RS") +
+  # tm_borders("grey40", lwd=2)
+
+# minimapa = tm_shape(World, projection = "+proj=gall", bbox = "Brasil")+
+#   tm_polygons(col="white")+ 
+#     # tm_text("iso_a3") + tm_legend(show=FALSE)+
+#   tm_shape(geo.uf)+
+#   tm_polygons()+
+#   # tm_compass(position=c("right", "bottom"))+
+#   # tm_scale_bar(position=c("right", "bottom"))+
+#   tm_shape(uf.rs)+
+#   tm_polygons(col="red")
+
+   # jpeg("minimapa.jpeg", units="in", width=1, height=1, res=600)
+   #  minimapaw   w
+   #  dev.off()
+# save.image("geo.RData")
+load("geo.RData")
+colnames(geo.uf)[1] = "UF"
+```
+
+
+Sidebar {.sidebar}
+===================================
+
+```{r, echo=FALSE}
+renderUI({
+  HTML(paste('<p>'))})
+  
+selectInput(inputId = "Indicador",
+            label = "Selecione o indicador:",
+            choices = censo.br$Indicador,
+            selected = ""
+            # selectize=FALSE
+            # selected = 1
+)
+
+uiOutput("Indicador")
+
+renderUI({
+  HTML(paste('<b>Indicador:</b>', 
+             filter(censo.siglas, SIGLA == 
+                          input$Indicador)[2], 
+             '<b><br> Nome Curto:</b>', filter(censo.siglas, SIGLA == 
+                          input$Indicador)[3],
+             '<b><br> Definição:</b>', filter(censo.siglas, SIGLA == 
+                          input$Indicador)[4]))
+
+})
+```
+
+Estados {data-icon="fa-picture"}
+=======================================================================
+
+Column
+-----------------------------------------------------------------------
+### 1991
+
+```{r, echo=FALSE, fig.height=5, fig.width=5}
+dados1 = reactive({
+    req(input$Indicador)
+  geo.uf %>%
+  dplyr::left_join(filter(censo.uf, ANO == 1991, Indicador == 
+                          input$Indicador) , by = "UF")
+})
+
+renderLeaflet({
+library(tmap)
+tmap_leaflet(
+plotmapakn(base = dados1(),
+          var = "Valor",
+          titulo = unique(input$Indicador),
+          estados = geo.uf,
+          Id = "UFN",
+          cores = "Spectral",
+          Style = "kmeans",
+          label = "Valor"
+          )
+) 
+
+})
+```
+
+
+### 2000
+
+```{r, echo=FALSE}
+
+dados2 = reactive({
+    req(input$Indicador)
+  geo.uf %>%
+  dplyr::left_join(filter(censo.uf, ANO == 2000, Indicador == 
+                          input$Indicador) , by = "UF")
+})
+
+renderLeaflet({
+library(tmap)
+tmap_leaflet(
+plotmapakn(base = dados2(),
+          var = "Valor",
+          Id = "UFN",
+          titulo = unique(input$Indicador),
+          estados = geo.uf,
+          cores = "Spectral",
+          Style = "kmeans",
+          label = "Valor"
+          )
+)
+
+})
+```
+
+Row
+-----------------------------------------------------------------------
+### 2010
+
+```{r, echo=FALSE}
+dados3 = reactive({
+    req(input$Indicador)
+  geo.uf %>%
+  dplyr::left_join(filter(censo.uf, ANO == 2010, Indicador == 
+                          input$Indicador) , by = "UF")
+})
+
+renderLeaflet({
+library(tmap)
+tmap_leaflet(
+plotmapakn(base = dados3(),
+          var = "Valor",
+          titulo = unique(input$Indicador),
+          estados = geo.uf,
+          cores = "Spectral",
+          Style = "kmeans",
+          Id = "abbrev_state",
+          label = "Valor"
+          )
+)
+
+})
+```
+
+
+
+
+
+
+
+<!-- Mapa Municípios Leitos {data-navmenu="Mapas Municípios"}  -->
+<!-- ======================================================================= -->
+
+<!-- Column -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ### Mapa leitos existentes, SUS e Não-SUS nos municípios -->
+
+<!-- ```{r mapars.leitos1, echo=FALSE, warning=FALSE} -->
+
+
+<!-- ``` -->
+
+
+
+<!-- Outro {data-navmenu="Mapas Municípios"} -->
+<!-- ======================================================================= -->
+
+<!-- Column -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ### Mapa leitos UTI Adultos (I, II e III) nos municípios -->
+
+<!-- ```{r, echo=FALSE, warning=FALSE, include=FALSE} -->
+
+<!-- ``` -->
+
+
+
+<!-- Faixas etárias municípios {data-navmenu="Mapas Municípios"} -->
+<!-- ======================================================================= -->
+
+<!-- Column -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ### Mapa faixas etárias nos municípios -->
+
+
+
+<!-- ```{r, echo=FALSE} -->
+
+<!-- ``` -->
+
+
+
+
+Tabelas {data-icon="fa-table"}
+=======================================================================
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+### Siglas
+
+
+```{r, echo=FALSE}
+DT::datatable(censo.siglas,
+              caption = 'Siglas', 
+              filter = 'top',
+              # colnames = c("NOME", "TÍTULO", "ANO", "REVISTA", "ISSN","LINK"),
+              editable = FALSE,
+              extensions = 'Buttons',
+              options = list(dom = 'Bfrtip', 
+                             pageLength = nrow(censo.siglas),
+                             paging = FALSE,
+                             scrollY = 700,
+                             fixedHeader = TRUE,
+                             scrollX = TRUE,
+                             # order = list( list(3, 'desc')),
+                             buttons = c('csv', 'pdf',"excel")))
+```
+
+### BR 
+
+```{r, echo=FALSE}
+DT::datatable(censo.br,
+              caption = 'BR', 
+              filter = 'top',
+              # colnames = c("NOME", "TÍTULO", "ANO", "REVISTA", "ISSN","LINK"),
+              editable = FALSE,
+              extensions = 'Buttons',
+              options = list(dom = 'Bfrtip', 
+                             pageLength = nrow(censo.br),
+                             paging = FALSE,
+                             scrollY = 700,
+                             fixedHeader = TRUE,
+                             scrollX = TRUE,
+                             # order = list( list(3, 'desc')),
+                             buttons = c('csv', 'pdf',"excel")))
+```
+
+### UF 
+
+```{r, echo=FALSE}
+DT::datatable(censo.uf,
+              caption = 'UF', 
+              filter = 'top',
+              # colnames = c("NOME", "TÍTULO", "ANO", "REVISTA", "ISSN","LINK"),
+              editable = FALSE,
+              extensions = 'Buttons',
+              options = list(dom = 'Bfrtip', 
+                             pageLength = nrow(censo.uf),
+                             paging = FALSE,
+                             scrollY = 700,
+                             fixedHeader = TRUE,
+                             scrollX = TRUE,
+                             # order = list( list(3, 'desc')),
+                             buttons = c('csv', 'pdf',"excel")))
+```
+
+
+Sobre {data-icon="fa-graduation-cap"}
+=======================================================================
+
+**Autores**
+
+ - Felipe Micail da Silva Smolski ([*Lattes*](http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K8279859Z3))
+
+- Reneo Prediger
+
+ - Edemar Rotta ([*Lattes*](http://lattes.cnpq.br/9661112584933921))
+ 
+ [DadosDr](https://dadosdr.uffs.edu.br/)
+
+**Fonte**: Atlas Brasil
+
+ 
+
+```{r, include=FALSE}
+# rm(list = ls())
+
+gc(reset=TRUE)
+# save.image("D:/Github/LeitosCovid-RS/leitoscovid.RData")
+```
+
+

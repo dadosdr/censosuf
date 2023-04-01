@@ -47,14 +47,24 @@ library(dplyr)
  
 
 
-# censo.mun <- read_excel("Atlas2013.xlsx",  sheet = "MUN 91-00-10")
-censo.uf <- read_excel("Atlas2013.xlsx",  sheet = "UF 91-00-10")
-censo.br <- read_excel("Atlas2013.xlsx",  sheet = "BR 91-00-10")
-censo.siglas <- read_excel("Atlas2013.xlsx",  sheet = "Siglas")
+censo.uf <- readxl::read_excel("Atlas2013.xlsx",  sheet = "UF 91-00-10")
+censo.br <- readxl::read_excel("Atlas2013.xlsx",  sheet = "BR 91-00-10")
+censo.siglas <- readxl::read_excel("Atlas2013.xlsx",  sheet = "Siglas")
+colnames(censo.br)[1]= "BRA"
+censo.uf91 = censo.uf |> dplyr::filter(ANO == "1991")
+censo.uf00 = censo.uf |> dplyr::filter(ANO == "2000")
+censo.uf10 = censo.uf |> dplyr::filter(ANO == "2010")
+censo.uf91 = tidyr::gather(censo.uf91, "Indicador", "Valor", 4:235)
+censo.uf00 = tidyr::gather(censo.uf00, "Indicador", "Valor", 4:235)
+censo.uf10 = tidyr::gather(censo.uf10, "Indicador", "Valor", 4:235)
+censo.br2 = tidyr::gather(censo.br, "Indicador", "Valor", 3:234)
+censo.brvar = cbind(censo.uf91, censo.uf10)
+colnames(censo.brvar) = c("ANO91", "UF", "UFN91", "Indicador91", "Valor91","ANO910", "UF10","UFN10", "Indicador10", "Valor10")
+censo.brvar$Var = round(censo.brvar$Valor10 - censo.brvar$Valor91,1)
 
-# censo.mun = tidyr::gather(censo.mun, "Indicador", "Valor", 6:237)
-censo.uf = tidyr::gather(censo.uf, "Indicador", "Valor", 4:235)
-censo.br = tidyr::gather(censo.br, "Indicador", "Valor", 3:234)
+load("geo2.RData")
+colnames(geo.uf)[1] = "UF"
+gc(reset=TRUE)
 ```
 
 
@@ -92,8 +102,6 @@ censo.br = tidyr::gather(censo.br, "Indicador", "Valor", 3:234)
    #  minimapaw   w
    #  dev.off()
 # save.image("geo.RData")
-load("geo.RData")
-colnames(geo.uf)[1] = "UF"
 ```
 
 
@@ -106,7 +114,7 @@ renderUI({
   
 selectInput(inputId = "Indicador",
             label = "Selecione o indicador:",
-            choices = censo.br$Indicador,
+            choices = censo.br2$Indicador,
             selected = ""
             # selectize=FALSE
             # selected = 1
@@ -135,27 +143,46 @@ Column
 
 ```{r, echo=FALSE, fig.height=5, fig.width=5}
 dados1 = reactive({
-    req(input$Indicador)
-  geo.uf %>%
-  dplyr::left_join(filter(censo.uf, ANO == 1991, Indicador == 
-                          input$Indicador) , by = "UF")
-})
+    # fetchData(input$Indicador)
+    geo.uf %>%
+      dplyr::left_join(filter(censo.uf91, Indicador ==
+                                input$Indicador) , by = "UF")})
 
-renderLeaflet({
-library(tmap)
-tmap_leaflet(
-plotmapakn(base = dados1(),
-          var = "Valor",
-          titulo = unique(input$Indicador),
-          estados = geo.uf,
-          Id = "UFN",
-          cores = "Spectral",
-          Style = "kmeans",
-          label = "Valor"
-          )
-) 
+    # bindCache(input$Indicador)
+  output$plot1 = renderTmap({
+    # tmap_mode(mode = "view")
+      plotmapakn(base = dados1(),
+                 var = "Valor",
+                 titulo = unique(input$Indicador),
+                 estados = geo.uf,
+                 Id = "UFN",
+                 cores = "Spectral",
+                 Style = "kmeans",
+                 label = "Valor")})
 
-})
+  
+  output$plot1 <- renderTmap({
+    tm_shape(World) +
+      tm_polygons(world_vars[1], zindex = 401)
+    
+          plotmapakn(base = dados1(),
+                 var = "Valor",
+                 titulo = unique(input$Indicador),
+                 estados = geo.uf,
+                 Id = "UFN",
+                 cores = "Spectral",
+                 Style = "kmeans",
+                 label = "Valor")
+  })
+  
+  observe({
+    var <- input$Indicador
+    tmapProxy("plot1", session, {
+      tm_remove_layer(401) +
+        tm_shape(World) +
+        tm_polygons(var, zindex = 401)
+    })
+  })  
 ```
 
 

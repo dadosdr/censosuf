@@ -3,10 +3,6 @@
 #' @param request Internal parameter for `{shiny}`.
 #'     DO NOT REMOVE.
 #' @import shiny
-#' @import tmap
-#' @import dplyr
-#' @import leaflet
-#' @import htmltools
 #' @import shinydashboard
 #' @import plotly
 #' @import ggthemes
@@ -15,32 +11,29 @@
 #' @import flexdashboard
 #' @import plotly
 #' @import htmltools
-#' @import readxl
-#' @import geobr
-#' @import tmap
 #' @import geobr
 #' @import RColorBrewer
-#' @import shiny
 #' @import leaflet
 #' @import sf
-#' @import spdep
+# @import spdep
 #' @import broom
-#' @import spdep
-#' @import spatialreg
-#' @import rgdal
-#' @import sphet
-#' @import tseries
-#' @import readxl
-#' @import splm
-#' @import geobr
+# @import spdep
+# @import spatialreg
+# @import rgdal
+# @import sphet
+# @import readxl
+# @import splm
 #' @import ggplot2
 #' @import tmap
 #' @import rgeoda
-#' @import ggplot2
-#' @import tseries
-#' @import dplyr
+# @import tseries
 #' @importFrom dplyr %>%
 source("funcoescred.R")
+library(shinydashboard)
+
+
+#devtools::load_all(".")
+#devtools::build()
 
 censo.uf <- readxl::read_excel("Atlas2013.xlsx",  sheet = "UF 91-00-10")
 censo.br <- readxl::read_excel("Atlas2013.xlsx",  sheet = "BR 91-00-10")
@@ -57,9 +50,9 @@ censo.brvar = cbind(censo.uf91, censo.uf10)
 colnames(censo.brvar) = c("ANO91", "UF", "UFN91", "Indicador91", "Valor91","ANO910", "UF10","UFN10", "Indicador10", "Valor10")
 censo.brvar$Var = round(censo.brvar$Valor10 - censo.brvar$Valor91,1)
 
-load("geo.RData")
+load("geo2.RData")
 colnames(geo.uf)[1] = "UF"
-
+gc(reset=TRUE)
 
 app_ui <- function(request) {
 
@@ -86,13 +79,13 @@ app_ui <- function(request) {
                    tabItems(tabItem(tabName = "estados",
                                     fluidRow(
                                       box(title = "1991",
-                                          leafletOutput("plot1", height = 300)),
+                                          tmapOutput("plot1", height = 300)),
                                       box(title = "2000",
-                                          leafletOutput("plot2", height = 300)),
+                                          tmapOutput("plot2", height = 300)),
                                       box(title = "2010",
-                                          leafletOutput("plot3", height = 300)),
+                                          tmapOutput("plot3", height = 300)),
                                       box(title = "Variação 1991-2010",
-                                          leafletOutput("plot4", height = 300)),
+                                          tmapOutput("plot4", height = 300)),
                                       box(title = "Descrição",
                                           collapsible = TRUE,
                                           collapsed=TRUE,
