@@ -10,18 +10,18 @@ observeEvent(input$Indicador,{
   dados1 <- reactive({
     # fetchData(input$Indicador)
     geo.uf %>%
-      dplyr::left_join(filter(censo.uf91, Indicador ==
+      dplyr::left_join(filter(censo.uf91, `NOME CURTO` ==
                                 input$Indicador) , by = "UF")})
   dados2 <- reactive({
     # fetchData(input$Indicador)
     geo.uf %>%
-      dplyr::left_join(filter(censo.uf00, Indicador ==
+      dplyr::left_join(filter(censo.uf00, `NOME CURTO` ==
                                 input$Indicador) , by = "UF")})
 
   dados3 <- reactive({
     # fetchData(input$Indicador)
     geo.uf %>%
-      dplyr::left_join(filter(censo.uf10, Indicador ==
+      dplyr::left_join(filter(censo.uf10, `NOME CURTO` ==
                                 input$Indicador) , by = "UF")})
 
   output$plot1 <- renderTmap({
@@ -64,7 +64,7 @@ observeEvent(input$Indicador,{
   dados4 <- reactive({
     # fetchData(input$Indicador)
     geo.uf %>%
-      dplyr::left_join(filter(censo.brvar, Indicador10 ==
+      dplyr::left_join(filter(censo.brvar, `NOME CURTO` ==
                                 input$Indicador) , by = "UF")
 
   })
@@ -80,39 +80,61 @@ observeEvent(input$Indicador,{
                Style = "kmeans",
                label = "Var")})
 
+
+
 })
 
 
 
+  output$tabbr <- DT::renderDataTable({
+    DT::datatable(censo.uf,
+                  extensions = 'Buttons',
+                  options = list(dom = 'Bfrtip',
+                                 paging = FALSE,
+                                 scrollY = 700,
+                                 fixedHeader = TRUE,
+                                 scrollX = TRUE,
+                                 order = list( list(3, 'desc')),
+                                 buttons = c('csv', 'excel')))
+  })
 
-
-
+  output$tabBR <- DT::renderDataTable({
+    DT::datatable(censo.br,
+                  extensions = 'Buttons',
+                  options = list(dom = 'Bfrtip',
+                                 paging = FALSE,
+                                 scrollY = 700,
+                                 fixedHeader = TRUE,
+                                 scrollX = TRUE,
+                                 order = list( list(3, 'desc')),
+                                 buttons = c('csv', 'excel')))
+  })
 
 
   output$desc <- renderText({
     req(input$Indicador)
     HTML(paste('<b>Indicador:</b>',
-               filter(censo.siglas, SIGLA ==
+               filter(censo.siglas, `NOME CURTO` ==
                         input$Indicador)[2],
-               '<b><br> Nome Curto:</b>', filter(censo.siglas, SIGLA ==
+               '<b><br> Nome Curto:</b>', filter(censo.siglas, `NOME CURTO` ==
                                                    input$Indicador)[3],
-               '<b><br> Definição:</b>', filter(censo.siglas, SIGLA ==
+               '<b><br> Definição:</b>', filter(censo.siglas, `NOME CURTO` ==
                                                   input$Indicador)[4]))})
   output$desc2 <- renderText({
     req(input$Indicador)
     HTML(paste('<b>Indicador:</b>',
-               filter(censo.siglas, SIGLA ==
+               filter(censo.siglas, `NOME CURTO` ==
                         input$Indicador)[2],
-               '<b><br> Nome Curto:</b>', filter(censo.siglas, SIGLA ==
+               '<b><br> Nome Curto:</b>', filter(censo.siglas, `NOME CURTO` ==
                                                    input$Indicador)[3],
-               '<b><br> Definição:</b>', filter(censo.siglas, SIGLA ==
+               '<b><br> Definição:</b>', filter(censo.siglas, `NOME CURTO` ==
                                                   input$Indicador)[4]))})
 
 
 
   dados5 <- reactive({
     # fetchData(input$Indicador)
-    filter(censo.br2, Indicador == input$Indicador)
+    filter(censo.br2, `NOME CURTO` == input$Indicador)
   })
     # bindCache(input$Indicador)
 

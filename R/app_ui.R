@@ -25,6 +25,7 @@
 # @import splm
 #' @import ggplot2
 #' @import tmap
+#' @importFrom DT dataTableOutput datatable
 # @import rgeoda
 # @import tseries
 #' @importFrom dplyr %>%
@@ -60,10 +61,10 @@ plotmapakn = function(..., base,
                              id = Id,
                              palette=cores)+
       tm_text(label) +
-      tm_compass(position=c("right", "bottom"))+
+      # tm_compass(position=c("right", "bottom"))+
       tm_layout(frame = FALSE, main.title = titulo, asp=0, title.position = c('right', 'top'))+
       tm_borders("black", lwd=.1, alpha = .3)+
-      tm_scale_bar(width = 0.22, position=c("right", "bottom"),lwd = .2)+
+      # tm_scale_bar(width = 0.22, position=c("right", "bottom"),lwd = .2)+
       tm_legend(position=c("left", "bottom"),
                 # compass.type="arrow",
                 compass.type="8star",
@@ -76,9 +77,7 @@ plotmapakn = function(..., base,
                                                               decimal.mark = ",",
                                                               digits=2,
                                                               format="fg"
-                                     )
-                ))+
-
+                                     )))+
       tm_shape(estados)+
       tm_borders("black", lwd=1)
 
@@ -92,12 +91,18 @@ censo.uf91 = censo.uf |> dplyr::filter(ANO == "1991")
 censo.uf00 = censo.uf |> dplyr::filter(ANO == "2000")
 censo.uf10 = censo.uf |> dplyr::filter(ANO == "2010")
 censo.uf91 = tidyr::gather(censo.uf91, "Indicador", "Valor", 4:235)
+censo.uf91 =  censo.uf91 %>% dplyr::left_join(censo.siglas, by=c("Indicador" = "SIGLA"))
 censo.uf00 = tidyr::gather(censo.uf00, "Indicador", "Valor", 4:235)
+censo.uf00 =  censo.uf00 %>% dplyr::left_join(censo.siglas, by=c("Indicador" = "SIGLA"))
 censo.uf10 = tidyr::gather(censo.uf10, "Indicador", "Valor", 4:235)
+censo.uf10 =  censo.uf10 %>% dplyr::left_join(censo.siglas, by=c("Indicador" = "SIGLA"))
 censo.br2 = tidyr::gather(censo.br, "Indicador", "Valor", 3:234)
+censo.br2 =  censo.br2 %>% dplyr::left_join(censo.siglas, by=c("Indicador" = "SIGLA"))
 censo.brvar = cbind(censo.uf91, censo.uf10)
-colnames(censo.brvar) = c("ANO91", "UF", "UFN91", "Indicador91", "Valor91","ANO910", "UF10","UFN10", "Indicador10", "Valor10")
-censo.brvar$Var = round(censo.brvar$Valor10 - censo.brvar$Valor91,1)
+colnames(censo.brvar) = c("ANO91", "UF", "UFN91", "Indicador91", "Valor91",  "NOME CURTO91",  "NOME LONGO91", "DEFINIÇÃO91",
+                          "ANO910", "UF10","UFN10", "Indicador10", "Valor10", "NOME CURTO",  "NOME LONGO", "DEFINIÇÃO")
+censo.brvar$Var = round(censo.brvar$Valor10 - censo.brvar$Valor91,2)
+
 
 load("geo2.RData")
 colnames(geo.uf)[1] = "UF"
@@ -106,19 +111,21 @@ gc(reset=TRUE)
 app_ui <- function(request) {
 
   dashboardPage( skin = "green",
-                 dashboardHeader(title = "DadosDR - Censos Brasil UF",titleWidth = 300),
+                 dashboardHeader(title = "DadosDR - Censos (Atlas Brasil)",titleWidth = 400),
                  ## Sidebar content
                  dashboardSidebar(
                    sidebarMenu(
                      selectInput(input = "Indicador",
                                  label = "Selecione o indicador:",
-                                 choices = censo.siglas$SIGLA[-c(1:5)],
-                                 selected = "ESPVIDA"
-                                 # selectize=FALSE
+                                 choices = censo.siglas$`NOME CURTO`[-c(1:5)],
+                                 # selected = censo.siglas$`NOME CURTO`[6]
+                                  selectize=FALSE
                                  # selected = 1
                      ),
                      menuItem("Estados", tabName = "estados", icon = icon("th")),
                      menuItem("BRA", tabName = "bra", icon = icon("flag")),
+                     menuItem("MUN", tabName = "mun", icon = icon("map-location")),
+                     menuItem("Dados", tabName = "plans", icon = icon("database")),
                      menuItem("Sobre", tabName = "sobre", icon = icon("users"))
 
                    )
@@ -138,7 +145,7 @@ app_ui <- function(request) {
                                           tmapOutput("plot2", height = 300)),
                                       box(title = "2010",
                                           tmapOutput("plot3", height = 300)),
-                                      box(title = "Variação 1991-2010",
+                                      box(title = "Variação 1991-2010 (unitária)",
                                           tmapOutput("plot4", height = 300)),
                                       )),
                             tabItem(tabName = "bra",
@@ -146,8 +153,14 @@ app_ui <- function(request) {
                                       box(title = "Gráfico", plotOutput("grafico")),
                                       box(title = "Descrição",htmlOutput("desc2"))
                                     )
-
                             ),
+                            tabItem(tabName = "plans",
+                                    fluidRow(
+                                      box("BRA", DT::dataTableOutput("tabBR", width = 400)),
+                                      box("UF",  DT::dataTableOutput("tabbr", width = 400)),
+                                      box("MUN", "Dados dos municípios")
+
+                                    )),
                             tabItem(tabName = "sobre",
                                     fluidRow(
                                       box(title = "Autores",
