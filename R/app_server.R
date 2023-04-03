@@ -4,6 +4,9 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
+#'
+
+library(DT)
 app_server <- function(input, output, session) {
 
 observeEvent(input$Indicador,{

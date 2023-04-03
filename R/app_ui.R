@@ -25,6 +25,7 @@
 # @import splm
 #' @import ggplot2
 #' @import tmap
+#' @import DT
 #' @importFrom DT dataTableOutput datatable
 # @import rgeoda
 # @import tseries
