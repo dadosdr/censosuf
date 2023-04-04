@@ -157,9 +157,13 @@ app_ui <- function(request) {
                             ),
                             tabItem(tabName = "plans",
                                     fluidRow(
-                                      box("BRA", DT::dataTableOutput("tabBR", width = 400)),
-                                      box("UF",  DT::dataTableOutput("tabbr", width = 400)),
-                                      box("MUN", "Dados dos municípios")
+                                      column(width = 12,
+                                      box(title="BRA", DT::dataTableOutput("tabBR", width = 500),collapsible = TRUE,
+                                          collapsed=TRUE),
+                                      box(title="UF",  DT::dataTableOutput("tabbr", width = 500),collapsible = TRUE,
+                                          collapsed=TRUE),
+                                      box(title="MUN", "Dados dos municípios",collapsible = TRUE,
+                                          collapsed=TRUE))
 
                                     )),
                             tabItem(tabName = "sobre",
