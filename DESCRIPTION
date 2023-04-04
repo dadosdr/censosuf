@@ -1,5 +1,5 @@
 Package: censosuf
-Title: An Amazing Shiny App
+Title: DadosDR Censos (Atlas Brasil)
 Version: 0.0.0.9000
 Authors@R: 
     person("firstname", "lastname", , "your@email.com", role = c("aut", "cre"))
