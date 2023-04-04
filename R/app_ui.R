@@ -26,6 +26,7 @@
 #' @import ggplot2
 #' @import tmap
 #' @import DT
+#' @import data.table
 #' @importFrom DT dataTableOutput datatable
 # @import rgeoda
 # @import tseries
