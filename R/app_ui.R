@@ -87,11 +87,15 @@ plotmapakn = function(..., base,
 
 censo.uf <- readxl::read_excel("Atlas2013.xlsx",  sheet = "UF 91-00-10")
 censo.br <- readxl::read_excel("Atlas2013.xlsx",  sheet = "BR 91-00-10")
+censo.mun <- readxl::read_excel("Atlas2013.xlsx",  sheet = "MUN 91-00-10")
 censo.siglas <- readxl::read_excel("Atlas2013.xlsx",  sheet = "Siglas")
 colnames(censo.br)[1]= "BRA"
 censo.uf91 = censo.uf |> dplyr::filter(ANO == "1991")
 censo.uf00 = censo.uf |> dplyr::filter(ANO == "2000")
 censo.uf10 = censo.uf |> dplyr::filter(ANO == "2010")
+censo.mun91 = censo.mun |> dplyr::filter(ANO == "1991")
+censo.mun00 = censo.mun |> dplyr::filter(ANO == "2000")
+censo.mun10 = censo.mun |> dplyr::filter(ANO == "2010")
 censo.uf91 = tidyr::gather(censo.uf91, "Indicador", "Valor", 4:235)
 censo.uf91 =  censo.uf91 %>% dplyr::left_join(censo.siglas, by=c("Indicador" = "SIGLA"))
 censo.uf00 = tidyr::gather(censo.uf00, "Indicador", "Valor", 4:235)
@@ -99,6 +103,13 @@ censo.uf00 =  censo.uf00 %>% dplyr::left_join(censo.siglas, by=c("Indicador" = "
 censo.uf10 = tidyr::gather(censo.uf10, "Indicador", "Valor", 4:235)
 censo.uf10 =  censo.uf10 %>% dplyr::left_join(censo.siglas, by=c("Indicador" = "SIGLA"))
 censo.br2 = tidyr::gather(censo.br, "Indicador", "Valor", 3:234)
+
+censo.mun91 = tidyr::gather(censo.mun91, "Indicador", "Valor", 5:237)
+censo.mun91 =  censo.mun91 %>% dplyr::left_join(censo.siglas, by=c("Indicador" = "SIGLA"))
+censo.mun00 = tidyr::gather(censo.mun00, "Indicador", "Valor", 5:237)
+censo.mun00 =  censo.mun00 %>% dplyr::left_join(censo.siglas, by=c("Indicador" = "SIGLA"))
+censo.mun10 = tidyr::gather(censo.mun10, "Indicador", "Valor", 5:237)
+censo.mun10 =  censo.uf10 %>% dplyr::left_join(censo.siglas, by=c("Indicador" = "SIGLA"))
 censo.br2 =  censo.br2 %>% dplyr::left_join(censo.siglas, by=c("Indicador" = "SIGLA"))
 censo.brvar = cbind(censo.uf91, censo.uf10)
 colnames(censo.brvar) = c("ANO91", "UF", "UFN91", "Indicador91", "Valor91",  "NOME CURTO91",  "NOME LONGO91", "DEFINIÇÃO91",
