@@ -1,6 +1,7 @@
 # censosuf
 ## Instalando os pacotes necessários
-install.packages(c("shiny", "pkgload","DT"))
+install.packages(c("shiny", "pkgload","DT","sf","tmap"))
+
 ## Carregando o app
 shiny::runGitHub("dadosdr/censosuf/", ref="main")
 
